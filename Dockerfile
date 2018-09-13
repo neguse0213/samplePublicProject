@@ -1,19 +1,11 @@
-FROM ubuntu:12.04
+FROM golang:1.9 as builder
+RUN go get -d -v golang.org/x/net/html
+RUN go get -d -v github.com/alexellis/href-counter/
+WORKDIR /go/src/github.com/alexellis/href-counter/.
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o app .
 
-# Install dependencies
-RUN apt-get update -y
-RUN apt-get install -y apache2
-
-# Install apache and write hello world message
-RUN echo "Hello World!" > /var/www/index.html
-
-# Configure apache
-RUN a2enmod rewrite
-RUN chown -R www-data:www-data /var/www
-ENV APACHE_RUN_USER www-data
-ENV APACHE_RUN_GROUP www-data
-ENV APACHE_LOG_DIR /var/log/apache2
-
-EXPOSE 80
-
-CMD ["/usr/sbin/apache2", "-D",  "FOREGROUND"]
+FROM alpine:latest
+RUN apk --no-cache add ca-certificates
+WORKDIR /root/
+COPY --from=builder /go/src/github.com/alexellis/href-counter/app .
+CMD ["./app"]
