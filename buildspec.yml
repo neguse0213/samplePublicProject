@@ -5,6 +5,7 @@ phases:
     commands:
       - echo Logging in to Amazon ECR...
       - echo aws --version
+      - aws codebuild list-builds
       - $(aws ecr get-login --no-include-email --region ap-northeast-1)
   build:
     commands:
