@@ -4,6 +4,7 @@ phases:
   pre_build:
     commands:
       - echo Logging in to Amazon ECR...
+      - systemctl status docker.service
       - $(aws ecr get-login --no-include-email --region ap-northeast-1 --registry-ids 030637341606)
   build:
     commands:
